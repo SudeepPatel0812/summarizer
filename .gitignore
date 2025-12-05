@@ -1,0 +1,54 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build / package directories
+/bin/
+/pkg/
+/obj/
+dist/
+build/
+
+# Go vendor (optional)
+//vendor/
+
+# Editor / IDE
+.vscode/
+*.code-workspace
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor swap/temp files
+*~
+*.swp
+*.swo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs / temp / downloads / generated media
+*.log
+*.tmp
+tmp/
+temp/
+downloads/
+video/
+*.mp4
+*.mkv
+*.webm
+*_video.tmp
+*_audio.tmp
+
+# Other
+coverage.out
