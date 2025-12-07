@@ -30,6 +30,7 @@ go run .
 - POST /download    — download a video
 
 ## File locations
+```
 ├───app
 │   ├───client
 │   │       openai_client.go
@@ -52,7 +53,7 @@ go run .
 ├───compose
 │       compose.yml
 └───video
-
+```
 ## Usage
 
 - Run docker compose command which will start the service on port 8080. You need to add Open AI API key in the environment variables section of the compose file.
