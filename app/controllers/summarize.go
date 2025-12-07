@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Transcribe(c *gin.Context) {
+func Summarizer(c *gin.Context) {
 	var req utils.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, utils.Response{
@@ -45,7 +45,7 @@ func Transcribe(c *gin.Context) {
 		return
 	}
 
-	transcribeResponse := client.Transcribe(audioExtractorResponse.Data.(map[string]interface{})["audio_path"].(string))
+	transcribeResponse := client.Summarizer(audioExtractorResponse.Data.(map[string]interface{})["audio_path"].(string))
 	if !transcribeResponse.Status {
 		c.JSON(http.StatusBadRequest, utils.Response{
 			Code:    400,
