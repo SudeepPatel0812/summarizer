@@ -1,4 +1,4 @@
-# summarizer
+# Summarizer
 
 A small Go service to download YouTube videos (uses github.com/kkdai/youtube) and serve a simple HTTP API with Gin.
 
@@ -30,19 +30,35 @@ go run .
 - POST /download    — download a video
 
 ## File locations
-- Main server: `main.go`
-- Controllers: `app/controllers/`
-- Services (downloader): `app/services/video_downloader.go`
-- Utilities (request/response types, validators): `app/utils/`
-- Downloads: `./video/` (created at runtime in working directory)
+├───app
+│   ├───client
+│   │       openai_client.go
+│   ├───controllers
+│   │       health_check.go
+│   │       summarize.go
+│   ├───models
+│   │       request.go
+│   │       response.go
+│   ├───routes
+│   │       routes.go
+│   ├───services
+│   │       audio_extractor.go
+│   │       video_downloader.go
+│   ├───utils
+│   │       clear_directory.go
+│   └───validators
+│           youtube_url_validator.go
+├───audio
+├───compose
+│       compose.yml
+└───video
+
+## Usage
+
+- Run docker compose command which will start the service on port 8080. You need to add Open AI API key in the environment variables section of the compose file.
 
 ## Notes & tips
 - If downloads lack audio, ensure ffmpeg is installed and the service is selecting/merging audio+video formats (the code attempts to mux when needed).
 - If VS Code terminal doesn't recognize `go` or `ffmpeg`, restart VS Code or launch it from a shell that has the correct PATH.
 - Add or adjust ignored files in `.gitignore` (the repo already ignores video outputs and temp files).
 
-## Contributing
-Feel free to open issues or submit PRs to improve format selection, parallel downloads, or add a web UI.
-
-## License
-Add your preferred license file (e.g. MIT) to the repo.
