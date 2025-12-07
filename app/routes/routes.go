@@ -7,6 +7,9 @@ import (
 )
 
 func InitRoutes(r *gin.Engine) {
+	// GET
 	r.GET("/health", controllers.HealthCheck)
-	r.POST("/download", controllers.DownloadController)
+
+	// POST
+	r.POST("/transcribe", controllers.DownloadVideoController)
 }
