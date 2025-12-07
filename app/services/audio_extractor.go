@@ -22,6 +22,7 @@ func ExtractAudioToWav(videoPath string) (string, error) {
 	baseFilename := strings.TrimSuffix(filepath.Base(videoPath), filepath.Ext(videoPath))
 	out := filepath.Join(audioDir, fmt.Sprintf("%s.wav", baseFilename))
 
+	fmt.Printf("[INFO]: Extracting Audio to Wav: %s\n", videoPath)
 	// ffmpeg -y -i input -vn -ac 1 -ar 16000 -f wav out
 	cmd := exec.Command("ffmpeg", "-y",
 		"-i", videoPath,
@@ -40,6 +41,8 @@ func ExtractAudioToWav(videoPath string) (string, error) {
 
 // isVideoExtension returns true for known video file extensions.
 func isVideoExtension(name string) bool {
+	
+	fmt.Printf("[INFO]: Video Extension: %s\n", name)
 	ext := strings.ToLower(filepath.Ext(name))
 	switch ext {
 	case ".mp4", ".mkv", ".mov", ".webm", ".avi", ".flv", ".wmv", ".mpeg":
@@ -85,6 +88,8 @@ func AudioExtractor(filename string) utils.Response {
 			}
 		}
 
+		fmt.Printf("[INFO]: Audio Extraction Successful: %s\n", srcFilename)
+
 		return utils.Response{
 			Code:    200,
 			Message: "Audio extraction successful",
@@ -94,7 +99,7 @@ func AudioExtractor(filename string) utils.Response {
 	}
 
 	return utils.Response{
-		Code:    200,
+		Code:    404,
 		Message: "File is not a video, no extraction needed",
 		Data:    nil,
 		Status:  true,
