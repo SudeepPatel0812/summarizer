@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func DownloadVideoController(c *gin.Context) {
+func Transcribe(c *gin.Context) {
 	var req utils.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, utils.Response{

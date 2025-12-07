@@ -11,5 +11,5 @@ func InitRoutes(r *gin.Engine) {
 	r.GET("/health", controllers.HealthCheck)
 
 	// POST
-	r.POST("/transcribe", controllers.DownloadVideoController)
+	r.POST("/transcribe", controllers.Transcribe)
 }
