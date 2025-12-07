@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"summarizer/app/utils"
+	"summarizer/app/models"
 )
 
 // ExtractAudioToWav extracts mono 16k WAV audio from an input video file using ffmpeg.
@@ -41,7 +41,7 @@ func ExtractAudioToWav(videoPath string) (string, error) {
 
 // isVideoExtension returns true for known video file extensions.
 func isVideoExtension(name string) bool {
-	
+
 	fmt.Printf("[INFO]: Video Extension: %s\n", name)
 	ext := strings.ToLower(filepath.Ext(name))
 	switch ext {
@@ -52,7 +52,7 @@ func isVideoExtension(name string) bool {
 	}
 }
 
-func AudioExtractor(filename string) utils.Response {
+func AudioExtractor(filename string) models.Response {
 
 	// Build path to file - only join if filename is not an absolute path
 	var videoPath string
@@ -68,7 +68,7 @@ func AudioExtractor(filename string) utils.Response {
 
 	// Check if file exists
 	if _, err := os.Stat(videoPath); os.IsNotExist(err) {
-		return utils.Response{
+		return models.Response{
 			Code:    404,
 			Message: fmt.Sprintf("[ERROR]: file not found: %s", videoPath),
 			Data:    nil,
@@ -80,7 +80,7 @@ func AudioExtractor(filename string) utils.Response {
 		// Extract audio
 		audioPath, err := ExtractAudioToWav(videoPath)
 		if err != nil {
-			return utils.Response{
+			return models.Response{
 				Code:    500,
 				Message: fmt.Sprintf("[ERROR]: extracting audio: %v", err),
 				Data:    nil,
@@ -90,7 +90,7 @@ func AudioExtractor(filename string) utils.Response {
 
 		fmt.Printf("[INFO]: Audio Extraction Successful: %s\n", srcFilename)
 
-		return utils.Response{
+		return models.Response{
 			Code:    200,
 			Message: "Audio extraction successful",
 			Data:    map[string]interface{}{"audio_path": audioPath},
@@ -98,7 +98,7 @@ func AudioExtractor(filename string) utils.Response {
 		}
 	}
 
-	return utils.Response{
+	return models.Response{
 		Code:    404,
 		Message: "File is not a video, no extraction needed",
 		Data:    nil,

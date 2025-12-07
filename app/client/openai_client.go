@@ -11,7 +11,7 @@ import (
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
 
-	"summarizer/app/utils"
+	"summarizer/app/models"
 )
 
 var openAI *openai.Client
@@ -81,26 +81,24 @@ func SummarizeText(text string) (string, error) {
 
 // TranscribeHandler is a Gin handler that accepts a filename parameter.
 // It fetches the file from the "videos" folder and transcribes it.
-func Summarizer(audioPath string) utils.Response {
+func Summarizer(audioPath string) models.Response {
 
 	ctx := context.Background()
 
 	// Transcribe
 	text, err := TranscribeAudioFile(ctx, audioPath)
 	if err != nil {
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: transcription failed: %v", err),
 			Data:    nil,
 			Status:  false,
 		}
 	}
-	// cleanup extracted audio after transcription
-	defer func() { _ = os.Remove(audioPath) }()
 
 	text, err = SummarizeText(text)
 	if err != nil {
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: summarization failed: %v", err),
 			Data:    nil,
@@ -109,7 +107,7 @@ func Summarizer(audioPath string) utils.Response {
 	}
 
 	// Success
-	return utils.Response{
+	return models.Response{
 		Code:    200,
 		Message: "Summary Generation Successful",
 		Data:    map[string]any{"Summary": text},
