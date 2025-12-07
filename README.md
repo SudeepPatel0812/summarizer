@@ -1,11 +1,14 @@
+
+![alt text](https://cdn.hashnode.com/res/hashnode/image/upload/v1698324966590/ecc115a4-12ef-4074-a7be-45a009792324.png)
+
 # Summarizer
 
-A small Go service to download YouTube videos (uses github.com/kkdai/youtube) and serve a simple HTTP API with Gin.
+A small Go service to download YouTube videos (uses github.com/kkdai/youtube) and serve a simple summary of the video over HTTP API with Gin.
 
 ## Features
 - Download YouTube videos (prefers combined audio+video; falls back to DASH download + ffmpeg muxing)
 - HTTP API built with Gin
-- Saves output files to a local `video/` directory (project working directory)
+- Saves output files to a local `video/` `audio/` directory (project working directory)
 - Simple JSON request/response model and structured service responses
 
 ## Prerequisites
@@ -26,10 +29,10 @@ go run .
 ```
 
 ## API
-- GET /             — health check (returns "ok")
-- POST /download    — download a video
+- GET /              — health check (returns "ok")
+- POST /summarize    — summarize a video (need to provide URL in body)
 
-## File locations
+## Files
 ```
 ├───app
 │   ├───client
