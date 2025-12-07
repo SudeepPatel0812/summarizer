@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"summarizer/app/utils"
+	"summarizer/app/models"
 	"summarizer/app/validators"
 
 	"github.com/kkdai/youtube/v2"
@@ -16,10 +16,10 @@ import (
 
 // VideoDownloader downloads a YouTube video. It prefers combined (audio+video) formats.
 // If the video only has separate audio/video (DASH), it downloads both and uses ffmpeg to mux.
-func VideoDownloader(url string) utils.Response {
+func VideoDownloader(url string) models.Response {
 	// Validate URL (assuming validators.YoutubeURLValidator returns true for invalid — keep your logic)
 	if validators.YoutubeURLValidator(url) {
-		return utils.Response{
+		return models.Response{
 			Code:    400,
 			Message: "URL is invalid",
 			Data:    nil,
@@ -31,7 +31,7 @@ func VideoDownloader(url string) utils.Response {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: get working dir: %v", err),
 			Data:    nil,
@@ -41,7 +41,7 @@ func VideoDownloader(url string) utils.Response {
 	outDir := filepath.Join(wd, "video")
 	fmt.Printf("[INFO]: creating/using folder: %s\n", outDir)
 	if err := os.MkdirAll(outDir, 0755); err != nil {
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: creating folder: %v", err),
 			Data:    nil,
@@ -52,7 +52,7 @@ func VideoDownloader(url string) utils.Response {
 	client := youtube.Client{}
 	video, err := client.GetVideo(url)
 	if err != nil {
-		return utils.Response{
+		return models.Response{
 			Code:    400,
 			Message: fmt.Sprintf("[ERROR]: getting video info: %v", err),
 			Data:    nil,
@@ -61,7 +61,7 @@ func VideoDownloader(url string) utils.Response {
 	}
 
 	if len(video.Formats) == 0 {
-		return utils.Response{
+		return models.Response{
 			Code:    400,
 			Message: "[ERROR]: no available formats",
 			Data:    nil,
@@ -84,14 +84,14 @@ func VideoDownloader(url string) utils.Response {
 		outPath := filepath.Join(outDir, fmt.Sprintf("%s-%d.%s", video.ID, combined.ItagNo, extensionFromMime(combined.MimeType)))
 		fmt.Printf("[INFO]: Found combined format itag=%d, saving to %s\n", combined.ItagNo, outPath)
 		if err := downloadFormat(&client, video, combined, outPath); err != nil {
-			return utils.Response{
+			return models.Response{
 				Code:    500,
 				Message: fmt.Sprintf("[ERROR]: downloading combined stream: %v", err),
 				Data:    nil,
 				Status:  false,
 			}
 		}
-		return utils.Response{
+		return models.Response{
 			Code:    200,
 			Message: fmt.Sprintf("[INFO]: saved to %s", outPath),
 			Data:    outPath,
@@ -107,14 +107,14 @@ func VideoDownloader(url string) utils.Response {
 		fallback := &video.Formats[0]
 		outPath := filepath.Join(outDir, fmt.Sprintf("%s-%d.%s", video.ID, fallback.ItagNo, extensionFromMime(fallback.MimeType)))
 		if err := downloadFormat(&client, video, fallback, outPath); err != nil {
-			return utils.Response{
+			return models.Response{
 				Code:    500,
 				Message: fmt.Sprintf("[ERROR]: fallback download failed: %v", err),
 				Data:    nil,
 				Status:  false,
 			}
 		}
-		return utils.Response{
+		return models.Response{
 			Code:    200,
 			Message: fmt.Sprintf("[INFO]: saved fallback to %s", outPath),
 			Data:    outPath,
@@ -133,7 +133,7 @@ func VideoDownloader(url string) utils.Response {
 	fmt.Printf("[INFO]: Downloading video stream to %s\n", videoTmp)
 	if err := downloadFormat(&client, video, videoFmt, videoTmp); err != nil {
 		cleanupFiles(videoTmp, audioTmp)
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: download video-only stream: %v", err),
 			Data:    nil,
@@ -144,7 +144,7 @@ func VideoDownloader(url string) utils.Response {
 	fmt.Printf("[INFO]: Downloading audio stream to %s\n", audioTmp)
 	if err := downloadFormat(&client, video, audioFmt, audioTmp); err != nil {
 		cleanupFiles(videoTmp, audioTmp)
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: download audio-only stream: %v", err),
 			Data:    nil,
@@ -156,7 +156,7 @@ func VideoDownloader(url string) utils.Response {
 	fmt.Printf("[INFO]: Muxing to final output %s using ffmpeg\n", finalOut)
 	if err := muxWithFFmpeg(videoTmp, audioTmp, finalOut); err != nil {
 		cleanupFiles(videoTmp, audioTmp, finalOut)
-		return utils.Response{
+		return models.Response{
 			Code:    500,
 			Message: fmt.Sprintf("[ERROR]: muxing streams: %v", err),
 			Data:    nil,
@@ -164,10 +164,7 @@ func VideoDownloader(url string) utils.Response {
 		}
 	}
 
-	// Cleanup temp pieces
-	cleanupFiles(videoTmp, audioTmp)
-
-	return utils.Response{
+	return models.Response{
 		Code:    200,
 		Message: fmt.Sprintf("[INFO]: saved to %s", finalOut),
 		Data:    finalOut,

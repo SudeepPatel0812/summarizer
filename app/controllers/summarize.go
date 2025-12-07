@@ -3,16 +3,18 @@ package controllers
 import (
 	"net/http"
 	"summarizer/app/client"
-	services "summarizer/app/services"
-	utils "summarizer/app/utils"
+	"summarizer/app/models"
+	"summarizer/app/services"
+	"summarizer/app/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Transcribe(c *gin.Context) {
-	var req utils.Request
+// Summarize the audio context from video.
+func Summarizer(c *gin.Context) {
+	var req models.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, utils.Response{
+		c.JSON(http.StatusBadRequest, models.Response{
 			Code:    400,
 			Message: err.Error(),
 			Data:    nil,
@@ -24,7 +26,7 @@ func Transcribe(c *gin.Context) {
 	videoDownloaderResponse := services.VideoDownloader(req.URL)
 
 	if !videoDownloaderResponse.Status {
-		c.JSON(http.StatusBadRequest, utils.Response{
+		c.JSON(http.StatusBadRequest, models.Response{
 			Code:    400,
 			Message: videoDownloaderResponse.Message,
 			Data:    videoDownloaderResponse.Data,
@@ -36,7 +38,7 @@ func Transcribe(c *gin.Context) {
 	audioExtractorResponse := services.AudioExtractor(videoDownloaderResponse.Data.(string))
 
 	if !audioExtractorResponse.Status {
-		c.JSON(http.StatusBadRequest, utils.Response{
+		c.JSON(http.StatusBadRequest, models.Response{
 			Code:    400,
 			Message: audioExtractorResponse.Message,
 			Data:    audioExtractorResponse.Data,
@@ -45,9 +47,9 @@ func Transcribe(c *gin.Context) {
 		return
 	}
 
-	transcribeResponse := client.Transcribe(audioExtractorResponse.Data.(map[string]interface{})["audio_path"].(string))
+	transcribeResponse := client.Summarizer(audioExtractorResponse.Data.(map[string]interface{})["audio_path"].(string))
 	if !transcribeResponse.Status {
-		c.JSON(http.StatusBadRequest, utils.Response{
+		c.JSON(http.StatusBadRequest, models.Response{
 			Code:    400,
 			Message: transcribeResponse.Message,
 			Data:    transcribeResponse.Data,
@@ -56,10 +58,12 @@ func Transcribe(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.Response{
+	c.JSON(http.StatusOK, models.Response{
 		Code:    200,
 		Message: transcribeResponse.Message,
 		Data:    transcribeResponse.Data,
 		Status:  transcribeResponse.Status,
 	})
+
+	defer utils.ClearMediaDirectories()
 }
