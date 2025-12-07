@@ -17,13 +17,12 @@ import (
 var openAI *openai.Client
 
 func init() {
-	envFile, _ := godotenv.Read(".env")
-	apiKey, ok := envFile["OPEN_AI_API_KEY"]
-	if !ok || strings.TrimSpace(apiKey) == "" {
-		log.Fatal("OPEN_AI_API_KEY not set")
-		os.Exit(1)
-	}
+    _ = godotenv.Load()
 
+    apiKey, ok := os.LookupEnv("OPEN_AI_API_KEY")
+    if !ok || strings.TrimSpace(apiKey) == "" {
+        log.Fatal("OPEN_AI_API_KEY not set")
+    }
 	// assign to package-level variable (no :=)
 	client := openai.NewClient(
 		option.WithAPIKey(apiKey),

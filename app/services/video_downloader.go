@@ -69,14 +69,6 @@ func VideoDownloader(url string) utils.Response {
 		}
 	}
 
-	// Inspect available formats (optional debug)
-	fmt.Printf("[DEBUG]: Available formats for video %s:\n", video.ID)
-	for i := range video.Formats {
-		f := &video.Formats[i]
-		fmt.Printf("  itag=%d mime=%s quality=%s audioCh=%d size=%d\n",
-			f.ItagNo, f.MimeType, f.QualityLabel, f.AudioChannels, f.ContentLength)
-	}
-
 	// Try to find a combined format first (AudioChannels > 0)
 	var combined *youtube.Format
 	for i := range video.Formats {
